@@ -1,0 +1,66 @@
+import { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import { addText } from '../func/drawingTools';
+import { applyFilter} from '../func/filters';
+import { clearAll } from '../func/clearAll';
+import { loadImage } from '../func/manageImage';
+import { downloadImage } from '../func/export';
+import { toggleDrawingMode } from '../func/freeDrawing';
+
+const Toolbox = ({ canvas, currentFilter, setCurrentFilter }) => {
+  const [drawingMode, setDrawingMode] = useState(false);
+
+  useEffect(() => {
+    if (canvas && currentFilter) {
+      applyFilter(canvas, currentFilter);
+    }
+  }, [canvas, currentFilter]);
+  
+  return (
+    <div className="toolbox">
+      <button title="Загрузить изображение">
+        <FontAwesomeIcon icon="image" />
+        <input
+          type="file"
+          accept=".png, .jpg, .jpeg"
+          onChange={loadImage(canvas)} />
+      </button>
+
+      <button title="Добавить текст" onClick={() => addText(canvas)}>
+        <FontAwesomeIcon icon="font" />
+      </button>
+
+      <button title="Режим рисования" onClick={() => toggleDrawingMode(canvas, setDrawingMode)} className={drawingMode ? 'active' : ''}>
+        <FontAwesomeIcon icon="pencil" />
+      </button>
+
+      <button title="Фильтры" 
+        onClick={() => setCurrentFilter(currentFilter ? null : 'sepia')} 
+        className={currentFilter ? 'active' : ''}>
+        <FontAwesomeIcon icon="filter" />
+      </button>
+      
+      {currentFilter && 
+        <select onChange={(e) => setCurrentFilter(e.target.value)} value={currentFilter}>
+          <option value="sepia">Sepia</option>
+          <option value="vintage">Vintage</option>
+          <option value="invert">Invert</option>
+          <option value="polaroid">Polaroid</option>
+          <option value="grayscale">Grayscale</option>
+        </select>
+      }
+
+      <button title="Очистить холст" onClick={() => clearAll(canvas)}>
+        <FontAwesomeIcon icon="trash" />
+      </button>
+
+      <button title="Скачать в png" onClick={() => downloadImage(canvas)}>
+        <FontAwesomeIcon icon="download" />
+      </button>
+
+    </div>
+  );
+};
+  
+export default Toolbox;
