@@ -10,10 +10,30 @@ import {
   faPencil, 
   faFilter, 
   faTrash, 
-  faDownload 
+  faDownload,
+  faPenToSquare,
+  faBold,
+  faItalic,
+  faUnderline,
+  faStrikethrough,
+  faSuperscript,
+  faSubscript
 } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faImage, faFont, faPencil, faFilter, faTrash, faDownload);
+library.add(faImage, 
+  faFont, 
+  faPencil, 
+  faFilter, 
+  faTrash, 
+  faDownload, 
+  faPenToSquare, 
+  faBold,
+  faItalic,
+  faUnderline,
+  faStrikethrough,
+  faSuperscript,
+  faSubscript
+);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

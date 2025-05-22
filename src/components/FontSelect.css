@@ -1,0 +1,56 @@
+:root {
+  --bg-dark: #5f6369;
+  --bg-panel: #393E46;
+  --bg-toolbar: #222831;
+  --border-color: #222831;
+  --text-color: #EEEEEE;
+  --text-muted: #c4c4c4;
+  --accent-color: #8F43EE;
+  --accent-color-hover: #8b34f7;
+}
+
+.font-select-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.font-select-button {
+  width: 100%;
+  padding: 0.4rem;
+  font-size: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-dark);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.font-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 0 0 4px 4px;
+  z-index: 1000;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+  padding: 0;
+  margin: 0;
+  list-style: none; 
+}
+
+.font-dropdown li {
+  padding: 0.4rem;
+  cursor: pointer;
+  list-style-type: none; 
+  font-size: 14px;
+}
+
+.font-dropdown li:hover {
+  background-color: var(--accent-color-hover);
+}

@@ -1,6 +1,7 @@
 import { forwardRef, useEffect } from 'react';
 
-const EditorCanvas = forwardRef(({ canvas, setCurrentFilter }, ref) => {
+
+const EditorCanvas = forwardRef(({ canvas, setCurrentFilter, isDrawingTextMode  }, ref) => {
   useEffect(() => {
     if(!canvas) return;
   
@@ -18,10 +19,10 @@ const EditorCanvas = forwardRef(({ canvas, setCurrentFilter }, ref) => {
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown, false);
-      
     }
   
   }, [canvas, setCurrentFilter]);
+
 
   
   return (

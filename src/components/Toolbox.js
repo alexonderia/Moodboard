@@ -7,9 +7,11 @@ import { clearAll } from '../func/clearAll';
 import { loadImage } from '../func/manageImage';
 import { downloadImage } from '../func/export';
 import { toggleDrawingMode } from '../func/freeDrawing';
+import { initTextTool } from '../func/drawingTools';
 
-const Toolbox = ({ canvas, currentFilter, setCurrentFilter }) => {
+const Toolbox = ({ canvas, currentFilter, setCurrentFilter, setShowLeftPanel, showLeftPanel, setShowRightPanel, showRightPanel }) => {
   const [drawingMode, setDrawingMode] = useState(false);
+  const [drawingTextMode, setDrawingTextMode] = useState(false);
 
   useEffect(() => {
     if (canvas && currentFilter) {
@@ -29,6 +31,10 @@ const Toolbox = ({ canvas, currentFilter, setCurrentFilter }) => {
 
       <button title="Добавить текст" onClick={() => addText(canvas)}>
         <FontAwesomeIcon icon="font" />
+      </button>
+
+      <button title="Добавить текст в рамке" onClick={() => initTextTool(canvas, setDrawingTextMode)} className={drawingTextMode ? 'active' : ''}>
+        <FontAwesomeIcon icon="pen-to-square" />
       </button>
 
       <button title="Режим рисования" onClick={() => toggleDrawingMode(canvas, setDrawingMode)} className={drawingMode ? 'active' : ''}>
@@ -58,6 +64,15 @@ const Toolbox = ({ canvas, currentFilter, setCurrentFilter }) => {
       <button title="Скачать в png" onClick={() => downloadImage(canvas)}>
         <FontAwesomeIcon icon="download" />
       </button>
+
+      <button title="Настройки холста" onClick={() => setShowLeftPanel(!showLeftPanel)}>
+        {showLeftPanel ? '←' : '→'}
+      </button>
+
+      <button title="Настройки объекта" onClick={() => setShowRightPanel(!showRightPanel)}>
+        {showRightPanel ? '→' : '←'}
+      </button>
+
 
     </div>
   );
