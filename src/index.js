@@ -5,8 +5,7 @@ import App from './App';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { 
-  faImage, 
-  faFont, 
+  faImage, faFont, 
   faPencil, 
   faFilter, 
   faTrash, 
@@ -17,7 +16,10 @@ import {
   faUnderline,
   faStrikethrough,
   faSuperscript,
-  faSubscript
+  faSubscript, faClone, faTrashAlt, faLayerGroup, faObjectUngroup,
+  faArrowUp, faArrowDown, faArrowsAltH, faArrowsAltV,
+  faSlash,
+  faBezierCurve
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faImage, 
@@ -32,7 +34,8 @@ library.add(faImage,
   faUnderline,
   faStrikethrough,
   faSuperscript,
-  faSubscript
+  faSubscript, faClone, faTrashAlt, faLayerGroup, faObjectUngroup,
+  faArrowUp, faArrowDown, faArrowsAltH, faArrowsAltV, faSlash, faBezierCurve
 );
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

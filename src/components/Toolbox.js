@@ -1,34 +1,33 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { addText } from '../func/drawingTools';
+import { addText } from '../func/drawingTextTools';
 import { applyFilter} from '../func/filters';
 import { clearAll } from '../func/clearAll';
 import { loadImage } from '../func/manageImage';
 import { downloadImage } from '../func/export';
-import { toggleDrawingMode } from '../func/freeDrawing';
-import { initTextTool } from '../func/drawingTools';
+import { toggleDrawingMode, toggleLineDrawingMode, togglePathDrawingMode  } from '../func/drawingTools';
+import { initTextTool } from '../func/drawingTextTools';
 
 const Toolbox = ({ canvas, currentFilter, setCurrentFilter, setShowLeftPanel, showLeftPanel, setShowRightPanel, showRightPanel }) => {
   const [drawingMode, setDrawingMode] = useState(false);
   const [drawingTextMode, setDrawingTextMode] = useState(false);
+  const [drawingLineMode, setDrawingLineMode] = useState(false);
+  const [drawingPathMode, setDrawingPathMode] = useState(false);
+  const [cleanupHandler, setCleanupHandler] = useState(null);
 
   useEffect(() => {
     if (canvas && currentFilter) {
       applyFilter(canvas, currentFilter);
     }
-  }, [canvas, currentFilter]);
+    return () => {
+      if (cleanupHandler) cleanupHandler();
+    };
+  }, [canvas, currentFilter, cleanupHandler]);
   
   return (
     <div className="toolbox">
-      <button title="Загрузить изображение">
-        <FontAwesomeIcon icon="image" />
-        <input
-          type="file"
-          accept=".png, .jpg, .jpeg"
-          onChange={loadImage(canvas)} />
-      </button>
-
+      
       <button title="Добавить текст" onClick={() => addText(canvas)}>
         <FontAwesomeIcon icon="font" />
       </button>
@@ -37,8 +36,32 @@ const Toolbox = ({ canvas, currentFilter, setCurrentFilter, setShowLeftPanel, sh
         <FontAwesomeIcon icon="pen-to-square" />
       </button>
 
-      <button title="Режим рисования" onClick={() => toggleDrawingMode(canvas, setDrawingMode)} className={drawingMode ? 'active' : ''}>
+      <button title="Режим свободного рисования" onClick={() => toggleDrawingMode(canvas, setDrawingMode)} className={drawingMode ? 'active' : ''}>
         <FontAwesomeIcon icon="pencil" />
+      </button>
+
+      <button
+        title="Режим рисования прямых"
+        onClick={() => toggleLineDrawingMode(canvas, setDrawingLineMode, setCleanupHandler)}
+        className={drawingLineMode ? 'active' : ''}
+      >
+        <FontAwesomeIcon icon="slash" />
+      </button>
+
+      <button
+        title="Режим рисования кривых"
+        onClick={() => togglePathDrawingMode(canvas, setDrawingPathMode, setCleanupHandler)}
+        className={drawingPathMode ? 'active' : ''}
+      >
+        <FontAwesomeIcon icon="bezier-curve" />
+      </button>
+
+      <button title="Загрузить изображение">
+        <FontAwesomeIcon icon="image" />
+        <input
+          type="file"
+          accept=".png, .jpg, .jpeg"
+          onChange={loadImage(canvas)} />
       </button>
 
       <button title="Фильтры" 
