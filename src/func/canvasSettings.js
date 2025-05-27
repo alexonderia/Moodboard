@@ -11,5 +11,3 @@ export function applyBackgroundColor(canvas, color) {
   canvas.renderAll();
 }
 
-
-// Здесь можно позже внедрить градиентную заливку через Grapick

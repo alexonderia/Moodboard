@@ -352,5 +352,3 @@ export function initializePathDrawing(canvas) {
     document.removeEventListener('mousedown', onDocumentMouseDown);
   };
 }
-
-

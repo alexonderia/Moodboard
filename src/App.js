@@ -12,7 +12,6 @@ function App() {
   const [canvas, setCanvas] = useState(null);
   const [currentFilter, setCurrentFilter] = useState(null);
   const [selectedObject, setSelectedObject] = useState(null);
-
   const [showLeftPanel, setShowLeftPanel] = useState(true);
   const [showRightPanel, setShowRightPanel] = useState(true);
   const [version, setVersion] = useState(0);
@@ -47,30 +46,22 @@ function App() {
     });
     
     const handleResize = () => {
-    const isSmall = window.innerWidth <= 768;
+      const isSmall = window.innerWidth <= 768;
+      if (isSmall) {
+        setShowLeftPanel(false);
+        setShowRightPanel(false);
+      }    
+    };
 
-    // При переходе на мобилку — закрыть панели
-    if (isSmall) {
-      setShowLeftPanel(false);
-      setShowRightPanel(false);
-    }
-
-    
-  };
-
-  window.addEventListener('resize', handleResize);
-
-  // Вызовем один раз при загрузке
-  handleResize();
+    window.addEventListener('resize', handleResize);
+    handleResize();
 
   return () => {
     window.removeEventListener('resize', handleResize);
     canvas.dispose();
-
     canvas.off({
       'selection:created': handleSelection,
       'selection:updated': handleSelection,
-
       'object:modified': updateSelected,
       'object:scaling': updateSelected,
       'object:moving': updateSelected,
@@ -95,9 +86,7 @@ function App() {
       </div>
       <div className="workspace">
         <div className={`sidebar left ${showLeftPanel ? 'active' : 'hidden'}`}>
-          {showLeftPanel && (
-            <CanvasSettingsPanel canvas={canvas} />
-          )}
+          {showLeftPanel && <CanvasSettingsPanel canvas={canvas} />}
         </div>
         <div className="canvasbox">
           <EditorCanvas 
@@ -108,9 +97,7 @@ function App() {
         </div>
       
         <div className={`sidebar right ${showRightPanel ? 'active' : 'hidden'}`}>
-          {showRightPanel && (
-            <ObjectSettingsPanel selected={selectedObject} canvas={canvas} />
-          )}
+          {showRightPanel && <ObjectSettingsPanel selected={selectedObject} canvas={canvas} />}
         </div>
 
       </div>

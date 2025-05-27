@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { addText } from '../func/drawingTextTools';
+import { addText, initTextTool } from '../func/drawingTextTools';
 import { applyFilter} from '../func/filters';
 import { clearAll } from '../func/clearAll';
 import { loadImage } from '../func/manageImage';
 import { downloadImage } from '../func/export';
 import { toggleDrawingMode, toggleLineDrawingMode, togglePathDrawingMode  } from '../func/drawingTools';
-import { initTextTool } from '../func/drawingTextTools';
 
 const Toolbox = ({ canvas, currentFilter, setCurrentFilter, setShowLeftPanel, showLeftPanel, setShowRightPanel, showRightPanel }) => {
   const [drawingMode, setDrawingMode] = useState(false);
@@ -40,16 +38,14 @@ const Toolbox = ({ canvas, currentFilter, setCurrentFilter, setShowLeftPanel, sh
         <FontAwesomeIcon icon="pencil" />
       </button>
 
-      <button
-        title="Режим рисования прямых"
+      <button title="Режим рисования прямых"
         onClick={() => toggleLineDrawingMode(canvas, setDrawingLineMode, setCleanupHandler)}
         className={drawingLineMode ? 'active' : ''}
       >
         <FontAwesomeIcon icon="slash" />
       </button>
 
-      <button
-        title="Режим рисования кривых"
+      <button title="Режим рисования кривых"
         onClick={() => togglePathDrawingMode(canvas, setDrawingPathMode, setCleanupHandler)}
         className={drawingPathMode ? 'active' : ''}
       >
@@ -95,8 +91,6 @@ const Toolbox = ({ canvas, currentFilter, setCurrentFilter, setShowLeftPanel, sh
       <button title="Настройки объекта" onClick={() => setShowRightPanel(!showRightPanel)}>
         {showRightPanel ? '→' : '←'}
       </button>
-
-
     </div>
   );
 };

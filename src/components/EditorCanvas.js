@@ -1,11 +1,9 @@
 import { forwardRef, useEffect } from 'react';
 
-
 const EditorCanvas = forwardRef(({ canvas, setCurrentFilter, isDrawingTextMode  }, ref) => {
   useEffect(() => {
     if(!canvas) return;
-  
-     
+    
     function handleKeyDown(e) {
       if(e.key === 'Delete') {
         for(const obj of canvas.getActiveObjects()) {
@@ -13,17 +11,13 @@ const EditorCanvas = forwardRef(({ canvas, setCurrentFilter, isDrawingTextMode  
           canvas.discardActiveObject();
         }
       }
-    }
-    
+    }    
     document.addEventListener('keydown', handleKeyDown, false);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown, false);
-    }
-  
+    }  
   }, [canvas, setCurrentFilter]);
-
-
   
   return (
     <div className="canvasbox">

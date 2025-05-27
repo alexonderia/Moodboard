@@ -10,8 +10,10 @@ import {
   faLayerGroup,
   faObjectUngroup
 } from '@fortawesome/free-solid-svg-icons';
-import { ActiveSelection, Group, filters} from 'fabric';
+import { ActiveSelection, Group, filters, Gradient} from 'fabric';
 import { useState, useEffect } from 'react';
+import ColorPicker, { useColorPicker } from 'react-best-gradient-color-picker';
+
 
 const ObjectSettingsPanel = ({ selected, canvas }) => {
 
@@ -20,6 +22,51 @@ const ObjectSettingsPanel = ({ selected, canvas }) => {
   const [brightness, setBrightness] = useState(0);
   const [saturation, setSaturation] = useState(0);
   const [gamma, setGamma] = useState({ r: 50, g: 50, b: 50 });
+
+  const [color, setColor] = useState('#ffffff');
+  
+  const { setSolid, setGradient } = useColorPicker(color, setColor);
+
+  useEffect(() => {
+    if (!selected) return;
+
+    const currentFill = selected.fill;
+
+    if (typeof currentFill === 'string' && currentFill !== color) {
+      setColor(currentFill);
+    } else if (currentFill?.colorStops) {
+      const gradientString = buildGradientString(currentFill);
+      if (gradientString !== color) {
+        setColor(gradientString);
+      }
+    }
+  }, [selected]);
+
+  useEffect(() => {
+    if (!selected || !color) return;
+
+    if (selected.type === 'group' || selected.type === 'activeSelection') return;
+
+    const currentFill = selected.fill;
+
+    if (typeof color === 'string' && 
+      (color.startsWith('linear-gradient') || color.startsWith('radial-gradient'))) {
+      
+      // Не применять, если текущий градиент уже совпадает
+      if (typeof currentFill !== 'object' || buildGradientString(currentFill) !== color) {
+        applyGradientToSelected(selected, color);
+      }
+
+    } else {
+      // Сплошной цвет
+      if (currentFill !== color) {
+        selected.set('fill', color);
+      }
+    }
+
+    canvas.renderAll();
+    canvas.fire('object:modified');
+  }, [color]);
 
   useEffect(() => {
 
@@ -46,8 +93,71 @@ const ObjectSettingsPanel = ({ selected, canvas }) => {
     } else {
       setGamma({ r: 50, g: 50, b: 50 });
     }
-  }, [selected]);
+    }, [selected]);
 
+  const applyGradientToSelected = (selected, gradientStr) => {
+    if (!selected) return;
+    const stops = parseGradient(gradientStr);
+    if (!stops) {
+      console.warn('Не удалось распарсить цвета из градиента');
+      return;
+    }
+
+    const type = getGradientType(gradientStr);
+
+    let gradient;
+
+    if (type === 'linear') {
+      gradient = new Gradient({
+        type: 'linear',
+        coords: {x1: 0, y1: 0, x2: selected.width, y2: 0 },
+        colorStops: stops,
+      });
+    } else if (type === 'radial') {
+      const width = selected.width * selected.scaleX;
+      const height = selected.height * selected.scaleY;
+
+      gradient = new Gradient({
+        type: 'radial',
+        coords: {
+          x1: width / 2, y1: height / 2,
+          r1: 0,
+          x2: width / 2, y2: height / 2,
+          r2: Math.max(width, height) / 2
+        },
+        colorStops: stops,
+      });
+    } 
+
+    selected.set('fill', gradient);
+    canvas.renderAll();
+  };
+
+  function buildGradientString(gradient) {
+    const stops = gradient.colorStops.map(stop => stop.color).join(', ');
+    if (gradient.type === 'linear') {
+      return `linear-gradient(90deg, ${stops})`;
+    } else if (gradient.type === 'radial') {
+      return `radial-gradient(circle, ${stops})`;
+    }
+    return '';
+  }
+
+  const parseGradient = (gradientStr) => {
+    const colorStops = gradientStr.match(/#(?:[0-9a-f]{3}){1,2}|rgba?\([^)]+\)/gi);
+    if (!colorStops || colorStops.length < 2) return null;
+
+    return colorStops.map((color, i) => ({
+      offset: i / (colorStops.length - 1),
+      color,
+    }));
+  };
+
+  const getGradientType = (gradientStr) => {
+    if (gradientStr.startsWith('linear-gradient')) return 'linear';
+    if (gradientStr.startsWith('radial-gradient')) return 'radial';
+    return null;
+  };
 
 
   const handleFilterChange = (effect, value) => {
@@ -262,16 +372,20 @@ const ObjectSettingsPanel = ({ selected, canvas }) => {
             }}
           />
 
-          <label>Цвет заливки</label>
-          <input
-            type="color"
-            value={selected.fill || '#000000'}
-            onChange={(e) => {
-              selected.set('fill', e.target.value);
-              canvas.renderAll();
-              canvas.fire('object:changed');
-            }}
-          />
+          {['rect', 'circle', 'path', 'line'].includes(selected.type) && selected.type !== 'group' && (
+            <>
+              <label>Цвет заливки</label>
+              <div style={{ marginBottom: '1em' }}>
+                <button onClick={() => setSolid('#ffffff')}>Сплошной</button>
+                <button
+                  onClick={() =>
+                    setGradient('linear-gradient(90deg, rgba(96,93,93,1) 0%, rgba(255,255,255,1) 100%)')
+                  }
+                >Градиент</button>
+              </div>
+              <ColorPicker value={color} onChange={setColor} hideColorTypeBtns={true} />
+            </>
+          )}
 
         </>
       )}
