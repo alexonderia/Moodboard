@@ -3,7 +3,7 @@ import { applyCanvasSize, applyBackgroundColor } from '../func/canvasSettings';
 import { Gradient } from 'fabric';
 import ColorPicker, { useColorPicker } from 'react-best-gradient-color-picker';
 
-const CanvasSettingsPanel = ({ canvas }) => {
+const CanvasSettingsPanel = ({ canvas, zoom, setZoom }) => {
   const [width, setWidth] = useState(1000);
   const [height, setHeight] = useState(500);
   const [color, setColor] = useState('#ffffff');
@@ -35,7 +35,6 @@ const CanvasSettingsPanel = ({ canvas }) => {
     if (typeof bg === 'string') {
       setColor(bg);
     } else if (bg && typeof bg.toLive === 'function') {
-      // fabric.Gradient
       const cssGradient = gradientToCss(bg);
       setColor(cssGradient);
     }
@@ -123,6 +122,23 @@ const CanvasSettingsPanel = ({ canvas }) => {
     updateCanvasBackground(color);
   }, [color, canvas]);
 
+  const zoomStep = 0.1;
+
+  const increaseZoom = () => {
+    if (zoom < 2) {
+      setZoom(Math.min(2, zoom + zoomStep));
+    }
+  };
+
+  const decreaseZoom = () => {
+    if (zoom > 0.1) {
+      setZoom(Math.max(0.1, zoom - zoomStep));
+    }
+  };
+
+  const resetZoom = () => {
+    setZoom(1);
+  };
 
   return (
     <div
@@ -134,6 +150,16 @@ const CanvasSettingsPanel = ({ canvas }) => {
       <label>Высота</label>
       <input type="number" value={height} onChange={(e) => setHeight(+e.target.value)} />
       <button onClick={handleSizeChange}>Сохранить</button>
+
+      <hr />
+
+      <label>Управление зумом</label>
+      <button onClick={decreaseZoom}>-</button>
+      <span style={{ margin: '0 1em' }}>{(zoom * 100).toFixed(0)}%</span>
+      <button onClick={increaseZoom}>+</button>
+      <button onClick={resetZoom} style={{ marginLeft: '1em' }}>
+        Сбросить
+      </button>
 
       <hr />
 

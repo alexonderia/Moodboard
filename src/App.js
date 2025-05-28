@@ -1,32 +1,40 @@
 import './App.css';
 import { useRef, useEffect, useState } from 'react';
 import { initCanvas } from './func/initCanvas';
-
 import Toolbox from './components/Toolbox';
 import EditorCanvas from './components/EditorCanvas';
 import CanvasSettingsPanel from './components/CanvasSettingsPanel';
 import ObjectSettingsPanel from './components/ObjectSettingsPanel';
+import { useUndoRedo } from './func/useUndoRedo';
 
 function App() {
   const canvasRef = useRef(null);
+  const canvasBoxRef = useRef(null);
   const [canvas, setCanvas] = useState(null);
+  const [zoom, setZoom] = useState(1);
   const [currentFilter, setCurrentFilter] = useState(null);
   const [selectedObject, setSelectedObject] = useState(null);
   const [showLeftPanel, setShowLeftPanel] = useState(true);
   const [showRightPanel, setShowRightPanel] = useState(true);
   const [version, setVersion] = useState(0);
-
+  const { undo, redo } = useUndoRedo(canvas);
 
   useEffect(() => {
     const canvas = initCanvas(canvasRef.current);
     setCanvas(canvas);
+    
+
+    setSelectedObject(null);
+    setShowRightPanel(false);
 
     function handleSelection(e) {
       const obj = canvas.getActiveObject();
       setSelectedObject(obj || null);
       const filter = obj?.filters?.at(0);
       setCurrentFilter(filter ? filter.type.toLowerCase() : null);
+      setShowRightPanel(!!obj); 
     }
+
 
     const updateSelected = () => {
       const obj = canvas.getActiveObject();
@@ -37,7 +45,10 @@ function App() {
     canvas.on({
       'selection:created': handleSelection,
       'selection:updated': handleSelection,
-      'selection:cleared': () => setSelectedObject(null),
+      'selection:cleared': () => {
+        setSelectedObject(null);
+        setShowRightPanel(false); 
+      },
       'object:modified': updateSelected,
       'object:scaling': updateSelected,
       'object:moving': updateSelected,
@@ -76,23 +87,27 @@ function App() {
       <div className="toolbar">
         <Toolbox 
           canvas={canvas} 
+          canvasBoxRef={canvasBoxRef}
           currentFilter={currentFilter} 
           setCurrentFilter={setCurrentFilter}
           setShowLeftPanel={setShowLeftPanel}
           showLeftPanel={showLeftPanel}
           setShowRightPanel={setShowRightPanel}
           showRightPanel={showRightPanel}
+          undo={undo}
+          redo={redo}
         />   
       </div>
       <div className="workspace">
         <div className={`sidebar left ${showLeftPanel ? 'active' : 'hidden'}`}>
-          {showLeftPanel && <CanvasSettingsPanel canvas={canvas} />}
+          {showLeftPanel && <CanvasSettingsPanel canvas={canvas} zoom={zoom} setZoom={setZoom} />}
         </div>
-        <div className="canvasbox">
+        <div className="canvasbox" ref={canvasBoxRef}>
           <EditorCanvas 
             ref={canvasRef} 
             canvas={canvas} 
             setCurrentFilter={setCurrentFilter}
+            zoom={zoom} setZoom={setZoom}
           />
         </div>
       
