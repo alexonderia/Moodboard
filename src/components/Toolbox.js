@@ -4,12 +4,12 @@ import { addText, toggleDrawingTextMode } from '../func/drawingTextTools';
 import { applyFilter} from '../func/filters';
 import { clearAll } from '../func/clearAll';
 import { loadImage, loadCanvasFromJSON } from '../func/import';
-import { downloadCanvasAsImage, downloadCanvasAsSVG, downloadCanvasAsJSON } from '../func/export';
+import { downloadCanvasAsImage, downloadCanvasAsSVG, downloadAsJSON } from '../func/export';
 import { saveInBrowser } from '../func/saveInBrowser';
 import { toggleDrawingMode, toggleLineDrawingMode, togglePathDrawingMode  } from '../func/drawingTools';
 
 
-const Toolbox = ({ canvas, canvasBoxRef, currentFilter, setCurrentFilter, setShowLeftPanel, showLeftPanel, setShowRightPanel, showRightPanel, undo, redo }) => {
+const Toolbox = ({ canvas, canvasBoxRef, currentFilter, setCurrentFilter, setShowLeftPanel, showLeftPanel, setShowRightPanel, showRightPanel, undo, redo, brief, setBrief }) => {
   const [drawingMode, setDrawingMode] = useState(false);
   const [drawingTextMode, setDrawingTextMode] = useState(false);
   const [drawingLineMode, setDrawingLineMode] = useState(false);
@@ -249,7 +249,7 @@ const Toolbox = ({ canvas, canvasBoxRef, currentFilter, setCurrentFilter, setSho
             } else if (type === 'jpg') {
               downloadCanvasAsImage(canvas, 'jpg');
             } else if (type === 'json') {
-              downloadCanvasAsJSON(canvas);
+              downloadAsJSON(canvas, brief);
             }
             modal.remove();
           });
@@ -263,7 +263,7 @@ const Toolbox = ({ canvas, canvasBoxRef, currentFilter, setCurrentFilter, setSho
         <input
           type="file"
           accept=".json"
-          onChange={loadCanvasFromJSON(canvas)}
+          onChange={loadCanvasFromJSON(canvas, setBrief)}
         />
       </button>
 

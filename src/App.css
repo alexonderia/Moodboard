@@ -7,13 +7,17 @@
   --text-muted: #c4c4c4;
   --accent-color: #8F43EE;
   --accent-color-hover: #8b34f7;
+  --font-main: 'Montserrat', sans-serif;
 }
+
 
 body {  
   touch-action: none;
   background-color: var(--bg-dark);
   color: var(--text-color);
+  font-family: 'Montserrat', sans-serif;
 }
+
 
 .editor {
   display: flex;
@@ -31,9 +35,11 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5em;
+  font-family: var(--font-main);
 }
 
 .toolbox button {
+  font-family: var(--font-main);
   width: 32px;
   height: 32px;
   position: relative;
@@ -115,6 +121,11 @@ body {
   transition: transform 0.3s ease, opacity 0.3s ease;
   opacity: 1;
   pointer-events: auto;
+  scrollbar-width: none; 
+  -ms-overflow-style: none;
+}
+.sidebar::-webkit-scrollbar {
+  display: none; 
 }
 
 .sidebar.active {
@@ -151,7 +162,7 @@ body {
 
 .panel {
   width: 100%;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-main);
   font-size: 14px;
   color: var(--text-color);
 }
@@ -172,6 +183,7 @@ body {
 .panel input[type="color"],
 .panel input[type="text"],
 .panel select {
+  font-family: var(--font-main);
   width: 100%;
   padding: 0.3rem;
   background-color: var(--bg-toolbar);
@@ -182,6 +194,7 @@ body {
 }
 
 .panel button {
+  font-family: var(--font-main);
   margin-top: 0.5rem;
   margin-right: 0.5rem;
   padding: 0.4rem 0.8rem;
@@ -265,7 +278,7 @@ body {
 .custom-modal-content {
   background: var(--bg-panel);
   color: var(--text-color);
-  font-family: sans-serif;
+  font-family: var(--font-main);
   padding: 20px;
   border-radius: 10px;
   text-align: center;

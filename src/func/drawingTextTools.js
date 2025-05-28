@@ -2,8 +2,11 @@ import { IText, Textbox, Rect } from 'fabric';
 
 export function addText(canvas) {
   if (!canvas) return;
-  const text = new IText('Новый текст');
-  canvas.add(text);
+  const text = new IText('Новый текст ', {
+    fontFamily: 'Montserrat',
+    fontSize: 24
+  });
+  canvas.add(text);  
   canvas.centerObject(text);
   canvas.setActiveObject(text); 
 }

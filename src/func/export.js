@@ -49,18 +49,22 @@ export const downloadCanvasAsSVG = (canvas) => {
   }, 100);
 };
 
-export function downloadCanvasAsJSON(canvas) {
+export function downloadAsJSON(canvas, briefData ) {
   if (!canvas) return;
 
-  const json = canvas.toJSON(['selectable', 'name']); // можешь добавить свои свойства
-  const jsonString = JSON.stringify(json);
+  const canvasJSON = canvas.toJSON(['selectable', 'name']);
+  const fullData = {
+    canvas: canvasJSON,
+    brief: briefData || null, // массив объектов с вопросами и ответами
+  };
 
+  const jsonString = JSON.stringify(fullData, null, 2);
   const blob = new Blob([jsonString], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement('a');
   link.href = url;
-  link.download = 'canvas.json';
+  link.download = 'project.json';
   link.click();
 
   setTimeout(() => URL.revokeObjectURL(url), 100);

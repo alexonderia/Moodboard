@@ -14,11 +14,11 @@ const fonts = [
 
 const FontSelect = ({ object, canvas }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedFont, setSelectedFont] = useState(object.fontFamily || 'Roboto');
-  const [originalFont, setOriginalFont] = useState(object.fontFamily || 'Roboto');
+  const [selectedFont, setSelectedFont] = useState(object.fontFamily || 'Montserrat');
+  const [originalFont, setOriginalFont] = useState(object.fontFamily || 'Montserrat');
 
   useEffect(() => {
-    const font = object?.fontFamily || 'Roboto';
+    const font = object?.fontFamily || 'Montserrat';
     setSelectedFont(font);
     setOriginalFont(font);
   }, [object]);

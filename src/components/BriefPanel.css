@@ -1,0 +1,136 @@
+:root {
+  --bg-dark: #5f6369;
+  --bg-panel: #393E46;
+  --bg-toolbar: #222831;
+  --border-color: #222831;
+  --text-color: #EEEEEE;
+  --text-muted: #c4c4c4;
+  --accent-color: #8F43EE;
+  --accent-color-hover: #8b34f7;
+  --font-main: 'Montserrat', sans-serif;
+}
+
+
+.brief-panel {
+  position: fixed;
+  width: 320px;
+  background: var(--bg-panel);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  z-index: 9999;
+  user-select: none;
+  color: var(--text-color);
+  font-family: var(--font-main);
+}
+
+.brief-panel.collapsed {
+  width: 50px;
+  height: 50px;
+  padding: 10px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-toolbar);
+  border: 1px solid var(--border-color);  
+  transition: background-color 0.2s ease;
+}
+
+.brief-panel.collapsed:hover {
+  background-color: var(--accent-color-hover);
+}
+.brief-header {
+  display: flex;
+  justify-content: space-between;
+  cursor: grab;
+  user-select: none;
+  color: var(--text-color);
+}
+
+.brief-header:active {
+  cursor: grabbing;
+}
+
+.brief-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  user-select: none;
+}
+
+.collapse-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text-color);
+  user-select: none;
+}
+
+.brief-body {
+  margin-top: 10px;
+}
+
+.questions-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 5px;
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
+}
+
+.questions-list::-webkit-scrollbar {
+  display: none; 
+}
+
+.question-block {
+  margin-bottom: 10px;
+}
+
+.question-block textarea {
+  width: 96%;
+  margin-bottom: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-toolbar);
+  color: var(--text-color);
+  resize: vertical;
+  font-family: var(--font-main);
+}
+
+.question-block button {
+  font-family: var(--font-main);
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.2s ease;
+}
+
+.question-block button:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.add-btn {
+  font-family: var(--font-main);
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  background-color: var(--bg-toolbar);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.add-btn:hover {
+  background-color: var(--accent-color-hover);
+  color: #fff;
+}

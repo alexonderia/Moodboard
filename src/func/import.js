@@ -21,7 +21,7 @@ export function loadImage(canvas) {
   };  
 }
 
-export function loadCanvasFromJSON(canvas) {
+export function loadCanvasFromJSON(canvas, setBriefData) {
   return function (e) {
     const file = e.target.files[0];
     if (!file || !canvas) return;
@@ -29,11 +29,24 @@ export function loadCanvasFromJSON(canvas) {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const json = JSON.parse(event.target.result);
-        canvas.loadFromJSON(json, () => {
-          canvas.renderAll();
-          console.log("Холст восстановлен из JSON.");
-        });
+        const parsed = JSON.parse(event.target.result);
+
+        // Восстановление холста
+        if (parsed.canvas) {
+          canvas.loadFromJSON(parsed.canvas, () => {
+            canvas.renderAll();
+            console.log("Холст восстановлен из JSON.");
+          });
+        } else {
+          console.warn("В файле не найден объект canvas.");
+        }
+
+        // Восстановление брифа
+        if (parsed.brief && typeof setBriefData === 'function') {
+          setBriefData(parsed.brief);
+          console.log("Бриф восстановлен.");
+        }
+
       } catch (err) {
         console.error("Ошибка при загрузке JSON:", err);
       }
@@ -43,3 +56,4 @@ export function loadCanvasFromJSON(canvas) {
     e.target.value = ''; // сброс input
   };
 }
+

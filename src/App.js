@@ -5,6 +5,7 @@ import Toolbox from './components/Toolbox';
 import EditorCanvas from './components/EditorCanvas';
 import CanvasSettingsPanel from './components/CanvasSettingsPanel';
 import ObjectSettingsPanel from './components/ObjectSettingsPanel';
+import BriefPanel from './components/BriefPanel';
 import { useUndoRedo } from './func/useUndoRedo';
 
 function App() {
@@ -18,6 +19,14 @@ function App() {
   const [showRightPanel, setShowRightPanel] = useState(true);
   const [version, setVersion] = useState(0);
   const { undo, redo } = useUndoRedo(canvas);
+
+  const defaultQuestions = [
+  { id: 1, question: 'Какая цель проекта?', answer: '' },
+  { id: 2, question: 'Какая целевая аудитория?', answer: '' },
+  { id: 3, question: 'Какой стиль/настроение вы хотите передать?', answer: '' },
+];
+  const [questions, setQuestions] = useState(defaultQuestions);
+
 
   useEffect(() => {
     const canvas = initCanvas(canvasRef.current);
@@ -84,6 +93,8 @@ function App() {
 
   return (
     <div className="editor">
+      <BriefPanel questions={questions ?? []} setQuestions={setQuestions} />
+
       <div className="toolbar">
         <Toolbox 
           canvas={canvas} 
@@ -96,6 +107,8 @@ function App() {
           showRightPanel={showRightPanel}
           undo={undo}
           redo={redo}
+          brief={questions}
+          setBrief={setQuestions}
         />   
       </div>
       <div className="workspace">
