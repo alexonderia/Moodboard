@@ -1,4 +1,7 @@
+import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import { updateProject } from '../api/projects';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { addText, toggleDrawingTextMode } from '../func/drawingTextTools';
 import { applyFilter} from '../func/filters';
@@ -9,14 +12,29 @@ import { saveInBrowser } from '../func/saveInBrowser';
 import { toggleDrawingMode, toggleLineDrawingMode, togglePathDrawingMode  } from '../func/drawingTools';
 
 
-const Toolbox = ({ canvas, canvasBoxRef, currentFilter, setCurrentFilter, setShowLeftPanel, showLeftPanel, setShowRightPanel, showRightPanel, undo, redo, brief, setBrief }) => {
+const Toolbox = ({
+  canvas,
+  canvasBoxRef,
+  currentFilter,
+  setCurrentFilter,
+  setShowLeftPanel,
+  showLeftPanel,
+  setShowRightPanel,
+  showRightPanel,
+  undo,
+  redo,
+  brief,
+  setBrief,
+  projectTitle,
+  setProjectTitle
+}) => {
   const [drawingMode, setDrawingMode] = useState(false);
   const [drawingTextMode, setDrawingTextMode] = useState(false);
   const [drawingLineMode, setDrawingLineMode] = useState(false);
   const [drawingPathMode, setDrawingPathMode] = useState(false);
   const [isPanning, setIsPanning] = useState(false);
   const [cleanupHandler, setCleanupHandler] = useState(null);
-
+  const { id } = useParams();
 
    // Состояние для хранения смещения контейнера
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
@@ -53,61 +71,109 @@ const Toolbox = ({ canvas, canvasBoxRef, currentFilter, setCurrentFilter, setSho
   }, [canvas, currentFilter, cleanupHandler]);
 
   useEffect(() => {
-      if (!isPanning || !canvasbox) return;
+    if (!isPanning || !canvasbox) return;
 
-      setDrawingMode(false);
-      setDrawingTextMode(false);
-      setDrawingLineMode(false);
-      setDrawingPathMode(false);
+    setDrawingMode(false);
+    setDrawingTextMode(false);
+    setDrawingLineMode(false);
+    setDrawingPathMode(false);
 
-      // События мыши на window для плавного перетаскивания
-      function onMouseDown(e) {
-        isDragging.current = true;
-        lastPos.current = { x: e.clientX, y: e.clientY };
-      }
+    // События мыши на window для плавного перетаскивания
+    function onMouseDown(e) {
+      isDragging.current = true;
+      lastPos.current = { x: e.clientX, y: e.clientY };
+    }
 
-      function onMouseMove(e) {
-        if (!isDragging.current) return;
+    function onMouseMove(e) {
+      if (!isDragging.current) return;
 
-        const dx = e.clientX - lastPos.current.x;
-        const dy = e.clientY - lastPos.current.y;
+      const dx = e.clientX - lastPos.current.x;
+      const dy = e.clientY - lastPos.current.y;
 
-        setPanOffset(prev => {
-          const newX = prev.x + dx;
-          const newY = prev.y + dy;
+      setPanOffset(prev => {
+        const newX = prev.x + dx;
+        const newY = prev.y + dy;
 
-          // Обновляем стиль контейнера
-          if (canvasbox) {
-            canvasbox.style.transform = `translate(${newX}px, ${newY}px)`;
-          }
+        // Обновляем стиль контейнера
+        if (canvasbox) {
+          canvasbox.style.transform = `translate(${newX}px, ${newY}px)`;
+        }
 
-          return { x: newX, y: newY };
-        });
+        return { x: newX, y: newY };
+      });
 
-        lastPos.current = { x: e.clientX, y: e.clientY };
-      }
+      lastPos.current = { x: e.clientX, y: e.clientY };
+    }
 
-      function onMouseUp() {
-        isDragging.current = false;
-      }
+    function onMouseUp() {
+      isDragging.current = false;
+    }
 
-      // Добавляем слушатели
-      canvasbox.addEventListener('mousedown', onMouseDown);
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
+    // Добавляем слушатели
+    canvasbox.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
 
-      // При выключении режима — сброс трансформации (по желанию)
-      return () => {
-        canvasbox.removeEventListener('mousedown', onMouseDown);
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
+    // При выключении режима — сброс трансформации (по желанию)
+    return () => {
+      canvasbox.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
 
-        isDragging.current = false;
-      };
-    }, [isPanning, canvasbox]);
+      isDragging.current = false;
+    };
+  }, [isPanning, canvasbox]);
+
+  
     
+  const updateProjectOnServer = async () => {
+    if (!canvas) return alert('Холст не загружен');
+    if (!id) return alert('Нет ID проекта для обновления');
+
+    try {
+      const canvasData = canvas.toJSON();
+
+      await updateProject(id, {
+        title: projectTitle || 'Без названия',
+        preview: canvas.toDataURL(),
+        data: canvas.toJSON(),
+      });
+
+      const token = localStorage.getItem('token');
+
+      await updateProject(id, {
+        title: brief?.title || 'Без названия',
+        preview: canvas.toDataURL(),
+        data: canvas.toJSON(),
+      });
+
+      alert('Проект успешно обновлён!');
+    } catch (error) {
+      console.error(error);
+      alert('Ошибка при обновлении проекта');
+    }
+  };
+
   return (
     <div className="toolbox">
+      <div className="project-header">
+        <input
+          type="text"
+          value={projectTitle}
+          onChange={(e) => setProjectTitle(e.target.value)}
+          placeholder="Введите название проекта"
+          className="project-title-input"
+        />
+
+        <button onClick={updateProjectOnServer} title="Сохранить проект на сервер">
+          💾 Сохранить
+        </button>
+
+        <button onClick={() => window.location.href = '/projects'} title="Назад к списку проектов">
+          🔙 К проектам
+        </button>
+      </div>
+
 
       <button
         title="Перемещение холста"
@@ -267,6 +333,9 @@ const Toolbox = ({ canvas, canvasBoxRef, currentFilter, setCurrentFilter, setSho
         />
       </button>
 
+      <button title="Сохранить проект на сервер" onClick={updateProjectOnServer}>
+        <FontAwesomeIcon icon="floppy-disk" />
+      </button>
 
     </div>
   );

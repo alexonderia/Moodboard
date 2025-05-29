@@ -302,6 +302,21 @@ body {
   color: #fff;
 }
 
+.project-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.project-title-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+
 /* Адаптивность */
 @media (max-width: 768px) {
   .sidebar.left.active,

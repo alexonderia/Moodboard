@@ -1,0 +1,89 @@
+.auth-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--bg-dark);
+}
+
+.auth-form {
+  background-color: var(--bg-panel);
+  padding: 2rem;
+  border-radius: 10px;
+  width: 320px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  font-family: var(--font-main);
+  color: var(--text-color);
+}
+
+.auth-form h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.auth-form label {
+  font-weight: 500;
+  margin-top: 1rem;
+  display: block;
+  color: var(--text-muted);
+}
+
+.auth-form input {
+  width: 95%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border-radius: 5px;
+  background-color: var(--bg-toolbar);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-family: var(--font-main);
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.auth-form button {
+  margin-top: 1.5rem;
+  width: 100%;
+  padding: 0.6rem;
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 1rem;
+  font-family: var(--font-main);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.auth-form button:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.auth-error {
+  margin-top: 1rem;
+  color: #ff6666;
+  text-align: center;
+  font-weight: bold;
+}
+
+.auth-toggle {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.auth-toggle span {
+  color: var(--accent-color);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.auth-toggle span:hover {
+  color: var(--accent-color-hover);
+}
