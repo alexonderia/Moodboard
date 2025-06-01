@@ -25,6 +25,7 @@ export function useUndoRedo(canvas) {
       isRestoring.current = true;
       canvas.loadFromJSON(JSON.parse(previous), () => {
         canvas.renderAll();
+        setTimeout(() => canvas.renderAll(), 20);
         isRestoring.current = false;
       });
     }
@@ -43,6 +44,7 @@ export function useUndoRedo(canvas) {
       isRestoring.current = true;
       canvas.loadFromJSON(JSON.parse(current), () => {
         canvas.renderAll();
+        setTimeout(() => canvas.renderAll(), 20);
         isRestoring.current = false;
       });
     }

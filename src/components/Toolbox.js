@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { updateProject } from '../api/projects';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { addText, toggleDrawingTextMode } from '../func/drawingTextTools';
@@ -10,7 +10,6 @@ import { loadImage, loadCanvasFromJSON } from '../func/import';
 import { downloadCanvasAsImage, downloadCanvasAsSVG, downloadAsJSON } from '../func/export';
 import { saveInBrowser } from '../func/saveInBrowser';
 import { toggleDrawingMode, toggleLineDrawingMode, togglePathDrawingMode  } from '../func/drawingTools';
-
 
 const Toolbox = ({
   canvas,
@@ -35,11 +34,10 @@ const Toolbox = ({
   const [isPanning, setIsPanning] = useState(false);
   const [cleanupHandler, setCleanupHandler] = useState(null);
   const { id } = useParams();
-
-   // Состояние для хранения смещения контейнера
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const lastPos = useRef({ x: 0, y: 0 });
   const isDragging = useRef(false);
+  const navigate = useNavigate();
 
   const canvasbox = canvasBoxRef?.current;
 
@@ -124,27 +122,44 @@ const Toolbox = ({
     };
   }, [isPanning, canvasbox]);
 
-  
+  function getThumbnailFromCanvas(canvas, maxWidth = 200, maxHeight = 150) {
+    // Создаём временный канвас для превью
+    const thumbCanvas = document.createElement('canvas');
+    const ctx = thumbCanvas.getContext('2d');
+
+    const scale = Math.min(maxWidth / canvas.width, maxHeight / canvas.height);
+
+    thumbCanvas.width = canvas.width * scale;
+    thumbCanvas.height = canvas.height * scale;
+
+    // Рисуем оригинальный canvas на временный с масштабом
+    ctx.scale(scale, scale);
+    ctx.drawImage(canvas.lowerCanvasEl, 0, 0);
+
+    return thumbCanvas.toDataURL('image/png');
+  }
+
     
   const updateProjectOnServer = async () => {
     if (!canvas) return alert('Холст не загружен');
     if (!id) return alert('Нет ID проекта для обновления');
 
     try {
-      const canvasData = canvas.toJSON();
+      // Собираем полные данные
+      const canvasData = canvas.toJSON(['selectable', 'name']);
+      const fullData = {
+        canvas: canvasData,
+        brief: brief || null,
+      };
 
+      // Сериализация как строка (тоже можно, как альтернатива: отправлять объект напрямую)
+      const serializedData = JSON.stringify(fullData);
+
+      // Отправляем обновлённые данные на сервер
       await updateProject(id, {
         title: projectTitle || 'Без названия',
-        preview: canvas.toDataURL(),
-        data: canvas.toJSON(),
-      });
-
-      const token = localStorage.getItem('token');
-
-      await updateProject(id, {
-        title: brief?.title || 'Без названия',
-        preview: canvas.toDataURL(),
-        data: canvas.toJSON(),
+        preview: getThumbnailFromCanvas(canvas),
+        data: serializedData,
       });
 
       alert('Проект успешно обновлён!');
@@ -154,191 +169,162 @@ const Toolbox = ({
     }
   };
 
+
   return (
     <div className="toolbox">
-      <div className="project-header">
+      <div className="toolbox-left">
+        <div className="toolbox-section">
+          <button
+            title="Перемещение холста"
+            onClick={() => {
+              setIsPanning(!isPanning);
+              setDrawingMode(false);
+              setDrawingTextMode(false);
+              setDrawingLineMode(false);
+              setDrawingPathMode(false);
+            }}
+            className={isPanning ? 'active' : ''}
+          >
+            <FontAwesomeIcon icon="hand-paper" />
+          </button>
+
+          <button title="Свободное рисование" onClick={() => toggleDrawingMode(canvas, setDrawingMode)} className={drawingMode ? 'active' : ''}>
+            <FontAwesomeIcon icon="pencil" />
+          </button>
+
+          <button title="Рисовать линии" onClick={() => toggleLineDrawingMode(canvas, setDrawingLineMode, setCleanupHandler)} className={drawingLineMode ? 'active' : ''}>
+            <FontAwesomeIcon icon="slash" />
+          </button>
+
+          <button title="Рисовать кривые" onClick={() => togglePathDrawingMode(canvas, setDrawingPathMode, setCleanupHandler)} className={drawingPathMode ? 'active' : ''}>
+            <FontAwesomeIcon icon="bezier-curve" />
+          </button>
+
+          <button title="Текст" onClick={() => addText(canvas)}>
+            <FontAwesomeIcon icon="font" />
+          </button>
+
+          <button title="Текст в рамке" onClick={() => toggleDrawingTextMode(canvas, setDrawingTextMode)} className={drawingTextMode ? 'active' : ''}>
+            <FontAwesomeIcon icon="pen-to-square" />
+          </button>
+        </div>
+
+        <div className="toolbox-section">
+          <button title="Загрузить изображение">
+            <FontAwesomeIcon icon="image" />
+            <input type="file" accept=".png, .jpg, .jpeg, .svg" onChange={loadImage(canvas)} />
+          </button>
+
+          <button title="Фильтр" onClick={() => setCurrentFilter(currentFilter ? null : 'sepia')} className={currentFilter ? 'active' : ''}>
+            <FontAwesomeIcon icon="filter" />
+          </button>
+
+          {currentFilter &&
+            <select onChange={(e) => setCurrentFilter(e.target.value)} value={currentFilter}>
+              <option value="sepia">Sepia</option>
+              <option value="vintage">Vintage</option>
+              <option value="invert">Invert</option>
+              <option value="polaroid">Polaroid</option>
+              <option value="grayscale">Grayscale</option>
+            </select>
+          }
+        </div>
+
+        <div className="toolbox-section">
+          <button title="Очистить" onClick={() => clearAll(canvas)}>
+            <FontAwesomeIcon icon="trash" />
+          </button>
+          <button title="Настройки холста" onClick={() => setShowLeftPanel(!showLeftPanel)}>
+            <FontAwesomeIcon icon="gear" />
+          </button>
+        </div>
+
+        <div className="toolbox-section">
+          <button title="Отменить" onClick={undo}>
+            <FontAwesomeIcon icon="arrow-rotate-left" />
+          </button>
+          <button title="Повторить" onClick={redo}>
+            <FontAwesomeIcon icon="arrow-rotate-right" />
+          </button>
+        </div>
+
+        <div className="toolbox-section">
+          <button title="Сохранить в браузере" onClick={() => {
+            if (canvas) {
+              saveInBrowser.save('canvasState', canvas.toJSON());
+              alert('Проект сохранён в браузере!\nВнимание! Данное действие не сохраняет проект на сервере.');
+            }
+          }}>
+            <FontAwesomeIcon icon="cloud-arrow-down" />
+          </button>
+
+          <button title="Загрузить из браузера" onClick={() => {
+            const saved = saveInBrowser.load('canvasState');
+            if (saved && canvas) {
+              canvas.loadFromJSON(saved, () => canvas.renderAll());
+              setTimeout(() => canvas.renderAll(), 20);
+              alert('Проект загружен!');
+            } else {
+              alert('Нет сохранённых данных.');
+            }
+          }}>
+            <FontAwesomeIcon icon="cloud-arrow-up" />
+          </button>
+
+          <button title="Скачать как.." onClick={() => {
+            document.querySelector('.custom-modal-container')?.remove();
+            const modal = document.createElement('div');
+            modal.className = 'custom-modal-container';
+            modal.innerHTML = `
+              <div class="custom-modal-content">            
+                <div class="button-download" id="png">Скачать PNG</div>
+                <div class="button-download" id="jpg">Скачать JPG</div>
+                <div class="button-download" id="svg">Скачать SVG</div>
+                <div class="button-download" id="json">Скачать JSON</div>
+              </div>
+            `;
+            document.body.appendChild(modal);
+            modal.addEventListener('click', () => modal.remove());
+            modal.querySelectorAll('.button-download').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!canvas) return;
+                const type = btn.id;
+                if (type === 'svg') downloadCanvasAsSVG(canvas);
+                else if (type === 'png') downloadCanvasAsImage(canvas);
+                else if (type === 'jpg') downloadCanvasAsImage(canvas, 'jpg');
+                else if (type === 'json') downloadAsJSON(canvas, brief);
+                modal.remove();
+              });
+            });
+          }}>
+            <FontAwesomeIcon icon="download" />
+          </button>
+
+          <button title="Открыть JSON">
+            <FontAwesomeIcon icon="upload" />
+            <input type="file" accept=".json" onChange={loadCanvasFromJSON(canvas, setBrief)} />
+          </button>
+        </div>
+      </div>
+      <div className="toolbox-section project-header">
         <input
           type="text"
           value={projectTitle}
           onChange={(e) => setProjectTitle(e.target.value)}
-          placeholder="Введите название проекта"
+          placeholder="Название проекта"
           className="project-title-input"
         />
-
-        <button onClick={updateProjectOnServer} title="Сохранить проект на сервер">
-          💾 Сохранить
+        <button onClick={updateProjectOnServer} title="Сохранить проект">
+          <FontAwesomeIcon icon="floppy-disk" />
         </button>
-
-        <button onClick={() => window.location.href = '/projects'} title="Назад к списку проектов">
-          🔙 К проектам
+        <button onClick={() => navigate('/projects')} title="К списку проектов">
+          <FontAwesomeIcon icon="house" />
         </button>
       </div>
-
-
-      <button
-        title="Перемещение холста"
-        onClick={() => {
-          setIsPanning(!isPanning);
-          setDrawingMode(false);
-          setDrawingTextMode(false);
-          setDrawingLineMode(false);
-          setDrawingPathMode(false);
-        }}
-        className={isPanning ? 'active' : ''}
-      >
-        <FontAwesomeIcon icon="hand-paper" />
-      </button>
-      
-      <button title="Добавить текст" onClick={() => addText(canvas)}>
-        <FontAwesomeIcon icon="font" />
-      </button>
-
-      <button title="Добавить текст в рамке" onClick={() => toggleDrawingTextMode(canvas, setDrawingTextMode)} className={drawingTextMode ? 'active' : ''}>
-        <FontAwesomeIcon icon="pen-to-square" />
-      </button>
-
-      <button title="Режим свободного рисования" onClick={() => toggleDrawingMode(canvas, setDrawingMode)} className={drawingMode ? 'active' : ''}>
-        <FontAwesomeIcon icon="pencil" />
-      </button>
-
-      <button title="Режим рисования прямых"
-        onClick={() => toggleLineDrawingMode(canvas, setDrawingLineMode, setCleanupHandler)}
-        className={drawingLineMode ? 'active' : ''}
-      >
-        <FontAwesomeIcon icon="slash" />
-      </button>
-
-      <button title="Режим рисования кривых"
-        onClick={() => togglePathDrawingMode(canvas, setDrawingPathMode, setCleanupHandler)}
-        className={drawingPathMode ? 'active' : ''}
-      >
-        <FontAwesomeIcon icon="bezier-curve" />
-      </button>
-
-      <button title="Загрузить изображение">
-        <FontAwesomeIcon icon="image" />
-        <input
-          type="file"
-          accept=".png, .jpg, .jpeg, .svg"
-          onChange={loadImage(canvas)} />
-      </button>
-
-      <button title="Фильтры" 
-        onClick={() => setCurrentFilter(currentFilter ? null : 'sepia')} 
-        className={currentFilter ? 'active' : ''}>
-        <FontAwesomeIcon icon="filter" />
-      </button>
-      
-      {currentFilter && 
-        <select onChange={(e) => setCurrentFilter(e.target.value)} value={currentFilter}>
-          <option value="sepia">Sepia</option>
-          <option value="vintage">Vintage</option>
-          <option value="invert">Invert</option>
-          <option value="polaroid">Polaroid</option>
-          <option value="grayscale">Grayscale</option>
-        </select>
-      }
-
-      <button title="Очистить холст" onClick={() => clearAll(canvas)}>
-        <FontAwesomeIcon icon="trash" />
-      </button>
-      
-      <button title="Настройки холста" onClick={() => setShowLeftPanel(!showLeftPanel)}>
-        <FontAwesomeIcon icon="gear" />
-      </button>
-
-      <button title="Отменить (Ctrl+Z)" onClick={undo}>
-        <FontAwesomeIcon icon="arrow-rotate-left" />
-      </button>
-
-      <button title="Повторить (Ctrl+Y)" onClick={redo}>
-        <FontAwesomeIcon icon="arrow-rotate-right" />
-        
-      </button>
-
-      <button title="Сохранить в браузере" onClick={() => {
-        if (canvas) {
-          const json = canvas.toJSON();
-          saveInBrowser.save('canvasState', json);
-          alert('Холст сохранён в браузере!');
-        }
-      }}>
-        <FontAwesomeIcon icon="floppy-disk" />
-      </button>
-
-      <button title="Загрузить из браузера" onClick={() => {
-        const saved = saveInBrowser.load('canvasState');
-        
-        if (saved && canvas) {
-          canvas.loadFromJSON(saved, () => {
-            canvas.renderAll();
-            alert('Холст загружен!');
-          });
-        } else {
-          alert('Нет сохранённого холста.');
-        }
-      }}>
-        <FontAwesomeIcon icon="folder-open" />
-      </button>
-
-      <button title="Скачать как..." onClick={() => {
-        // Удаляем старую модалку, если есть
-        document.querySelector('.custom-modal-container')?.remove();
-
-        const modal = document.createElement('div');
-        modal.className = 'custom-modal-container';
-        modal.innerHTML = `
-          <div class="custom-modal-content">            
-            <div class="button-download" id="png">Скачать как PNG</div>
-            <div class="button-download" id="jpg">Скачать как JPG</div>
-            <div class="button-download" id="svg">Скачать как SVG</div>
-            <div class="button-download" id="json">Скачать как JSON</div>
-          </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        // Закрытие по клику вне
-        modal.addEventListener('click', () => modal.remove());
-
-        // Клик по кнопкам внутри
-        modal.querySelectorAll('.button-download').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const type = btn.id;
-            if (!canvas) return;
-
-            if (type === 'svg') {
-              downloadCanvasAsSVG(canvas);
-            } else if (type === 'png') {
-              downloadCanvasAsImage(canvas);
-            } else if (type === 'jpg') {
-              downloadCanvasAsImage(canvas, 'jpg');
-            } else if (type === 'json') {
-              downloadAsJSON(canvas, brief);
-            }
-            modal.remove();
-          });
-        });
-      }}>
-        <FontAwesomeIcon icon="download" />
-      </button>
-
-      <button title="Открыть JSON">
-        <FontAwesomeIcon icon="file-upload" />
-        <input
-          type="file"
-          accept=".json"
-          onChange={loadCanvasFromJSON(canvas, setBrief)}
-        />
-      </button>
-
-      <button title="Сохранить проект на сервер" onClick={updateProjectOnServer}>
-        <FontAwesomeIcon icon="floppy-disk" />
-      </button>
-
     </div>
   );
+
 };
   
 export default Toolbox;

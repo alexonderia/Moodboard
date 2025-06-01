@@ -6,44 +6,24 @@ import App from './App';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { 
-  faImage, faFont, 
-  faPencil, 
-  faFilter, 
-  faTrash, 
-  faDownload,
-  faPenToSquare,
-  faBold,
-  faItalic,
-  faUnderline,
-  faStrikethrough,
-  faSuperscript,
-  faSubscript, faClone, faTrashAlt, faLayerGroup, faObjectUngroup,
-  faArrowUp, faArrowDown, faArrowsAltH, faArrowsAltV,
-  faSlash,
-  faBezierCurve,
-  faHandPaper,
-  faGear,
-  faArrowRotateLeft,
-  faArrowRotateRight,
-  faFloppyDisk,
-  faFolderOpen,
-  faFileUpload
+  faFloppyDisk, faHouse,faHandPaper,faPencil,
+  faSlash, faBezierCurve, faFont, faPenToSquare, faImage,
+  faFilter, faTrash, faGear, faArrowRotateLeft, faArrowRotateRight,
+  faCloudArrowDown, faCloudArrowUp, faDownload, faUpload,
+  faBold, faItalic, faUnderline, faStrikethrough, faSuperscript, faSubscript, 
+  faLeftRight, faUpDown, faArrowUp, faArrowDown, faClone,
+  faTrashCan, faLayerGroup, faObjectUngroup,
+  faUser, faRightToBracket
 } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faImage, 
-  faFont, faHandPaper,
-  faPencil, 
-  faFilter, 
-  faTrash, faGear, faArrowRotateLeft,  faArrowRotateRight,
-  faDownload, 
-  faPenToSquare, 
-  faBold,
-  faItalic, faFloppyDisk, faFolderOpen, faFileUpload,
-  faUnderline,
-  faStrikethrough,
-  faSuperscript,
-  faSubscript, faClone, faTrashAlt, faLayerGroup, faObjectUngroup,
-  faArrowUp, faArrowDown, faArrowsAltH, faArrowsAltV, faSlash, faBezierCurve
+library.add(faFloppyDisk, faHouse,faHandPaper,faPencil,
+  faSlash, faBezierCurve, faFont, faPenToSquare, faImage,
+  faFilter, faTrash, faGear, faArrowRotateLeft, faArrowRotateRight,
+  faCloudArrowDown, faCloudArrowUp, faDownload, faUpload,
+  faBold, faItalic, faUnderline, faStrikethrough, faSuperscript, faSubscript, 
+  faLeftRight, faUpDown, faArrowUp, faArrowDown, faClone,
+  faTrashCan, faLayerGroup, faObjectUngroup,
+  faUser, faRightToBracket
 );
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

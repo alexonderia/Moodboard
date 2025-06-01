@@ -1,5 +1,6 @@
 import './EditorPage.css';
 import React, { useRef, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { initCanvas } from '../../func/initCanvas';
 import Toolbox from '../../components/Toolbox';
 import EditorCanvas from '../../components/EditorCanvas';
@@ -7,8 +8,10 @@ import CanvasSettingsPanel from '../../components/CanvasSettingsPanel';
 import ObjectSettingsPanel from '../../components/ObjectSettingsPanel';
 import BriefPanel from '../../components/BriefPanel';
 import { useUndoRedo } from '../../func/useUndoRedo';
+import { fetchProjectById } from '../../api/projects';
 
 function EditorPage({ user }) {
+  const { id } = useParams();
   const canvasRef = useRef(null);
   const canvasBoxRef = useRef(null);
   const [canvas, setCanvas] = useState(null);
@@ -25,7 +28,43 @@ function EditorPage({ user }) {
   ]);
   const { undo, redo } = useUndoRedo(canvas);
   const [projectTitle, setProjectTitle] = useState('Без названия');
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    if (!id) return;
+
+    async function loadProject() {
+      try {
+        const response = await fetchProjectById(id);
+        const data = response.data;
+
+        if (canvas && data) {
+          let parsedData = data.data;
+          setProjectTitle(data.title || 'Без названия');
+          if (typeof parsedData === 'string') {
+            parsedData = JSON.parse(parsedData);
+          }
+
+          if (!parsedData.canvas) {
+            console.warn('В данных проекта нет canvas');
+            return;
+          }
+
+          canvas.loadFromJSON(parsedData.canvas, () => {
+            canvas.renderAll();
+          });
+       
+          if (parsedData.brief) setQuestions(parsedData.brief);
+          setTimeout(() => canvas.renderAll(), 20);
+        }
+      } catch (err) {
+        console.error('Ошибка при загрузке проекта:', err);
+      }
+    }
+
+    loadProject();
+
+  }, [id, canvas]);
 
   useEffect(() => {
     const canvas = initCanvas(canvasRef.current);
@@ -87,6 +126,8 @@ function EditorPage({ user }) {
       });
     };
   }, [canvasRef, setCanvas]);
+
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="editor">

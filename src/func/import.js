@@ -46,7 +46,7 @@ export function loadCanvasFromJSON(canvas, setBriefData) {
           setBriefData(parsed.brief);
           console.log("Бриф восстановлен.");
         }
-
+        setTimeout(() => canvas.renderAll(), 20);
       } catch (err) {
         console.error("Ошибка при загрузке JSON:", err);
       }

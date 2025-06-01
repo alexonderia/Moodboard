@@ -10,6 +10,7 @@ API.interceptors.request.use((config) => {
 });
 
 export const fetchProjects = () => API.get('/projects');
+export const fetchProjectById = (id) => API.get(`/projects/${id}`);
 export const createProject = (data) => API.post('/projects', data);
 export const updateProject = (id, data) => API.put(`/projects/${id}`, data);
 export const deleteProject = (id) => API.delete(`/projects/${id}`);

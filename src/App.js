@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate , Routes, Route } from 'react-router-dom';
 import AuthForm from './pages/AuthPage/AuthForm';
 import EditorPage from './pages/EditorPage/EditorPage';
@@ -10,6 +10,12 @@ import './pages/AuthPage/AuthForm.css';
 function App() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setUser({}); 
+    }
+  }, []);
 
   const handleAuthSuccess = (token, user) => {
     localStorage.setItem('token', token);
@@ -23,7 +29,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<AuthForm />} />
+      <Route path="/" element={<AuthForm onAuthSuccess={handleAuthSuccess}  />} />
       <Route path="/projects" element={<ProjectsPage user={user} />} />
       <Route path="/editor/new" element={<EditorPage user={user} />} />
       <Route path="/editor/:id" element={<EditorPage user={user} />} />

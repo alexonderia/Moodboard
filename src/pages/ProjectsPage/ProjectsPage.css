@@ -1,3 +1,16 @@
+:root {
+  --bg-dark: #5f6369;
+  --bg-panel: #393E46;
+  --bg-toolbar: #222831;
+  --border-color: #222831;
+  --text-color: #EEEEEE;
+  --text-muted: #c4c4c4;
+  --accent-color: #8F43EE;
+  --accent-color-hover: #8b34f7;
+  --font-main: 'Montserrat', sans-serif;
+}
+
+
 .dashboard {
   padding: 2rem;
   font-family: var(--font-main);
@@ -12,36 +25,68 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  justify-content: flex-start;
 }
 
 .project-card {
-  background-color: var(--bg-panel);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 1rem;
-  width: 220px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  text-align: center;
-}
-
-.project-card:hover {
-  background-color: var(--bg-toolbar);
+  border-radius: 6px;
+  background: var(--bg-panel);
+  width: 230px; 
+  min-height: 230px; 
+  box-sizing: border-box;
 }
 
 .project-thumbnail {
-  background: #222;
-  width: 200px;
-  height: 150px;
+  background: var(--bg-dark);
+  width: 100%; 
+  height: 150px; 
   border: 1px solid var(--border-color);
   border-radius: 8px;
+  object-fit: cover;
   margin-bottom: 0.5rem;
+}
+
+.project-thumbnail.placeholder {
+  background: var(--bg-dark);
+  height: 150px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 0.5rem;
+}
+
+.project-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-grow: 1;
 }
 
 .project-title {
   color: var(--text-color);
   font-size: 1rem;
   font-weight: 500;
+  flex: 1;
+  user-select: none;
+  overflow-wrap: break-word;
+}
+
+.delete-button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.delete-button:hover {
+  color: var(--accent-color);
 }
 
 .project-card.new {
@@ -51,10 +96,18 @@
   justify-content: center;
   color: var(--accent-color);
   border: 2px dashed var(--accent-color);
+  width: 230px; 
+  height: 230px;
+  box-sizing: border-box;
 }
 
 .new-project-icon {
+  width: 100%;
+  height: 150px;
   margin-bottom: 0.5rem;
+  font-size: 3rem;
+  text-align: center;
+  align-content: center;
 }
 
 .custom-modal-container {
@@ -95,11 +148,89 @@
   background-color: var(--accent-color);
   color: #fff;
 }
+.button-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-content: flex-end; 
+}
+
+.custom-button {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  font-family: var(--font-main);
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.custom-button.create {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.custom-button.create:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.custom-button.cancel {
+  background-color: var(--bg-toolbar);
+  color: var(--text-muted);
+}
+
+.custom-button.cancel:hover {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.custom-input {
+  width: 95%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border-radius: 5px;
+  background-color: var(--bg-toolbar);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-family: var(--font-main);
+}
+
+.custom-input::placeholder {
+  color: var(--text-muted);
+}
+
+.custom-input:focus {
+   outline: none;
+  border-color: var(--accent-color);
+}
+
+.profile-meta {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+
+.custom-button.danger {
+  background-color: #d9534f;
+  color: white;
+}
+.custom-button.danger:hover {
+  background-color: #c9302c;
+}
+
+
 
 @media (max-width: 768px) {
-  .project-card {
+  .project-card, .project-card.new {
     width: 100%;
     max-width: 300px;
     min-width: 180px;
+    height: auto;
+  }
+
+  .project-thumbnail, .project-thumbnail.placeholder {
+    height: 150px;
   }
 }

@@ -17,3 +17,9 @@ export const login = (email, password) =>
 
 export const register = (email, username, password) =>
   AUTH.post('/register', { email, username, password });
+
+export const updateUser = (data) =>
+  AUTH.put('/update', data);
+
+export const deleteUser = () =>
+  AUTH.delete('/delete');

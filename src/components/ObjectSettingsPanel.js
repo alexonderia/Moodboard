@@ -1,15 +1,5 @@
 import { TextSettings } from '../func/textSelectionSettings';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faArrowsAltH,
-  faArrowsAltV,
-  faArrowUp,
-  faArrowDown,
-  faClone,
-  faTrashAlt,
-  faLayerGroup,
-  faObjectUngroup
-} from '@fortawesome/free-solid-svg-icons';
 import { ActiveSelection, Group, filters, Gradient} from 'fabric';
 import { useState, useEffect } from 'react';
 import ColorPicker, { useColorPicker } from 'react-best-gradient-color-picker';
@@ -414,28 +404,28 @@ const ObjectSettingsPanel = ({ selected, canvas }) => {
       <label>Действия</label>
       <div className="object-options">
         <button onClick={() => handleFlip('X')} title="Отразить по Х">
-          <FontAwesomeIcon icon={faArrowsAltH} />
+          <FontAwesomeIcon icon={"left-right"} />
         </button>
         <button onClick={() => handleFlip('Y')} title="Отразить по Y">
-          <FontAwesomeIcon icon={faArrowsAltV} />
+          <FontAwesomeIcon icon={"up-down"} />
         </button>
         <button onClick={bringForward} title="На передний план">
-          <FontAwesomeIcon icon={faArrowUp} />
+          <FontAwesomeIcon icon={"arrow-up"} />
         </button>
         <button onClick={sendBackward} title="На задний план">
-          <FontAwesomeIcon icon={faArrowDown} />
+          <FontAwesomeIcon icon={'arrow-down'} />
         </button>
         <button onClick={duplicate} title="Дублировать">
-          <FontAwesomeIcon icon={faClone} />
+          <FontAwesomeIcon icon={"clone"} />
         </button>
         <button onClick={deleteObject} title="Удалить">
-          <FontAwesomeIcon icon={faTrashAlt} />
+          <FontAwesomeIcon icon={"trash-can"} />
         </button>
         <button onClick={groupObjects} title="Группировать">
-          <FontAwesomeIcon icon={faLayerGroup} />
+          <FontAwesomeIcon icon={"layer-group"} />
         </button>
         <button onClick={ungroupObjects} title="Разгруппировать">
-          <FontAwesomeIcon icon={faObjectUngroup} />
+          <FontAwesomeIcon icon={"object-ungroup"} />
         </button>
       </div>
 

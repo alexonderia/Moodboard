@@ -31,10 +31,17 @@ export default function AuthForm({ onAuthSuccess }) {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('userId', data.user.id);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
 
       onAuthSuccess(data.token, data.user);
     } catch (err) {
-      setError('Ошибка сети');
+      console.error('Ошибка при авторизации:', err);
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Ошибка сети');
+      }
     }
   };
 
