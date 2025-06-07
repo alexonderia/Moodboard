@@ -122,7 +122,7 @@ const Toolbox = ({
     };
   }, [isPanning, canvasbox]);
 
-  function getThumbnailFromCanvas(canvas, maxWidth = 200, maxHeight = 150) {
+  function getThumbnailFromCanvas(canvas, maxWidth = 500, maxHeight = 500) {
     // Создаём временный канвас для превью
     const thumbCanvas = document.createElement('canvas');
     const ctx = thumbCanvas.getContext('2d');
@@ -249,14 +249,31 @@ const Toolbox = ({
         </div>
 
         <div className="toolbox-section">
-          <button title="Сохранить в браузере" onClick={() => {
-            if (canvas) {
-              saveInBrowser.save('canvasState', canvas.toJSON());
-              alert('Проект сохранён в браузере!\nВнимание! Данное действие не сохраняет проект на сервере.');
-            }
-          }}>
+          <button
+            title="Сохранить в браузере"
+            onClick={() => {
+              if (!canvas) return;
+
+              const json = canvas.toJSON();
+              const jsonString = JSON.stringify(json);
+              const sizeKB = new Blob([jsonString]).size / 1024;
+
+              if (sizeKB > 4500) {
+                alert(`Объект слишком большой для сохранения в браузере (${Math.round(sizeKB)} KB). Попробуйте экспортировать JSON или сохранить на сервер.`);
+              } else {
+                try {
+                  saveInBrowser.save('canvasState', json);
+                  alert('Проект сохранён в браузере!\nВнимание! Данное действие не сохраняет проект на сервере.');
+                } catch (error) {
+                  alert('Ошибка при сохранении. Возможно, превышен лимит.');
+                  console.error(error);
+                }
+              }
+            }}
+          >
             <FontAwesomeIcon icon="cloud-arrow-down" />
           </button>
+
 
           <button title="Загрузить из браузера" onClick={() => {
             const saved = saveInBrowser.load('canvasState');

@@ -6,13 +6,11 @@ import ColorPicker, { useColorPicker } from 'react-best-gradient-color-picker';
 
 
 const ObjectSettingsPanel = ({ selected, canvas }) => {
-
   const object = selected;
   const [blur, setBlur] = useState(0);
   const [brightness, setBrightness] = useState(0);
   const [saturation, setSaturation] = useState(0);
   const [gamma, setGamma] = useState({ r: 50, g: 50, b: 50 });
-
   const [color, setColor] = useState('#ffffff');
   
   const { setSolid, setGradient } = useColorPicker(color, setColor);
@@ -31,6 +29,7 @@ const ObjectSettingsPanel = ({ selected, canvas }) => {
       }
     }
   }, [selected]);
+
 
   useEffect(() => {
     if (!selected || !color) return;
@@ -148,7 +147,6 @@ const ObjectSettingsPanel = ({ selected, canvas }) => {
     if (gradientStr.startsWith('radial-gradient')) return 'radial';
     return null;
   };
-
 
   const handleFilterChange = (effect, value) => {
     if (!selected) return;
@@ -442,9 +440,9 @@ const ObjectSettingsPanel = ({ selected, canvas }) => {
           canvas.fire('object:changed');
         }}
       />
-
+     
       {selected.type === 'image' && (
-        <>
+        <>          
           <label>Размытие</label>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <input
